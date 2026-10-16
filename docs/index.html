@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CTR Opportunity Scoring | FlyRank ML Internship</title>
+  <meta name="description" content="A public-safe research artifact on leakage-aware CTR opportunity scoring for search content review.">
+  <style>
+    :root { --ink: #17221f; --muted: #62706b; --paper: #f7f5ef; --panel: #fffdf8; --line: #d8ddd5; --accent: #0f766e; --accent-soft: #d9f0e8; --warm: #e8a34a; --max: 1080px; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font: 16px/1.65 Georgia, serif; }
+    header, main, footer { max-width: var(--max); margin: auto; padding: 0 28px; }
+    header { padding-top: 72px; padding-bottom: 56px; }
+    .eyebrow { color: var(--accent); font: 700 12px/1.2 Arial, sans-serif; letter-spacing: .14em; text-transform: uppercase; }
+    h1, h2, h3 { font-family: Arial, sans-serif; line-height: 1.08; letter-spacing: -.035em; }
+    h1 { max-width: 780px; margin: 18px 0; font-size: clamp(42px, 7vw, 78px); }
+    h2 { margin: 0 0 18px; font-size: 30px; }
+    h3 { margin: 0 0 8px; font-size: 18px; letter-spacing: -.02em; }
+    .dek { max-width: 720px; color: var(--muted); font-size: 21px; }
+    .meta { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-top: 26px; color: var(--muted); font: 13px Arial, sans-serif; }
+    section { border-top: 1px solid var(--line); padding: 54px 0; }
+    .section-grid { display: grid; grid-template-columns: minmax(170px, .35fr) 1fr; gap: 48px; }
+    .section-label { color: var(--accent); font: 700 12px Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+    p { max-width: 730px; }
+    .lede { font-size: 22px; line-height: 1.45; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 22px; }
+    .number { color: var(--accent); font: 700 32px Arial, sans-serif; }
+    .chart { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 24px; }
+    .bar-row { display: grid; grid-template-columns: 150px 1fr 54px; align-items: center; gap: 12px; margin: 15px 0; font: 14px Arial, sans-serif; }
+    .bar { height: 16px; overflow: hidden; background: #e5e9e3; border-radius: 2px; }
+    .bar span { display: block; height: 100%; background: var(--accent); }
+    .bar-row.model .bar span { background: var(--warm); }
+    table { width: 100%; border-collapse: collapse; background: var(--panel); font-size: 15px; }
+    th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); text-align: left; }
+    th { font: 700 12px Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+    code { color: #155e59; background: var(--accent-soft); padding: 2px 5px; border-radius: 3px; font: 13px Consolas, monospace; }
+    ol, ul { max-width: 730px; padding-left: 24px; }
+    a { color: var(--accent); }
+    footer { border-top: 1px solid var(--line); padding-top: 28px; padding-bottom: 60px; color: var(--muted); font-size: 14px; }
+    @media (max-width: 720px) { header { padding-top: 42px; } .section-grid { grid-template-columns: 1fr; gap: 18px; } .cards { grid-template-columns: 1fr; } .bar-row { grid-template-columns: 100px 1fr 45px; font-size: 12px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="eyebrow">FlyRank ML Internship · Machine Learning</div>
+    <h1>CTR Opportunity Scoring for Search Content Review</h1>
+    <p class="dek">A leakage-aware, human-reviewed ranking system for finding visible pages that may be under-capturing clicks.</p>
+    <div class="meta"><span>Feature window: March 2026</span><span>Outcome window: April 2026</span><span>Decision metric: Precision@10</span></div>
+  </header>
+  <main>
+    <section><div class="section-grid"><div class="section-label">Abstract</div><div><p class="lede">Can search visibility signals prioritize pages that deserve metadata or content review?</p><p>I used the pseudonymized FlyRank internship warehouse, aggregated available Search Console observations to client-content-month rows, and compared a transparent CTR-gap baseline with Logistic Regression. On a client-grouped April outcome split, the baseline measured Precision@10 of 0.40 and Logistic Regression measured 0.30. The result is directional decision-support evidence: the simpler baseline is preferable for this slice, and no content change should be automated from the score.</p></div></div></section>
+    <section><div class="section-grid"><div class="section-label">01 · Problem</div><div><h2>A queue, not a publishing bot</h2><p>The decision is which visible pages an SEO or content reviewer should inspect first. The output is an ordered queue with one reason code and one action label. A wrong recommendation costs review time or may prompt an unnecessary content change, so the system deliberately stops before publishing.</p><div class="cards"><div class="card"><div class="number">78.8M</div><p>daily fact rows in the released warehouse</p></div><div class="card"><div class="number">9.8M</div><p>rows in the March feature partition</p></div><div class="card"><div class="number">176,738</div><p>available client-content groups</p></div></div></div></div></section>
+    <section><div class="section-grid"><div class="section-label">02 · Data</div><div><h2>One month forward, one month held out</h2><p>The source is <code>fact_content_daily_performance</code>, with <code>dim_content</code> reserved for future content metadata joins. The raw grain is one pseudonymized client-content-report-date row; the decision frame aggregates this to client-content-month.</p><table><thead><tr><th>Window</th><th>Use</th><th>Boundary</th></tr></thead><tbody><tr><td>March 2026</td><td>Features and baseline queue</td><td>Search Console availability filtered with <code>IS TRUE</code></td></tr><tr><td>April 2026</td><td>Future CTR-improvement label</td><td>Never used as a decision-time feature</td></tr></tbody></table><p>Client and content hashes are retained only for grouping and internal row joins. They are not interpreted as identities or published as client information.</p></div></div></section>
+    <section><div class="section-grid"><div class="section-label">03 · Method</div><div><h2>Transparent before complex</h2><p>The baseline score is positive CTR gap versus a position benchmark multiplied by <code>log1p(impressions)</code>. The model is Logistic Regression over impressions, CTR, average position, organic sessions, and CTR gap. Validation keeps all rows from a client in one split.</p><ol><li>Check CTR-vs-position and impression-volume signals in buckets.</li><li>Rank by the baseline score and assign <code>CTR_UNDERCAPTURE</code>.</li><li>Compare the baseline and model on the same held-out clients.</li><li>Audit future-window leakage and inspect false positives.</li></ol></div></div></section>
+    <section><div class="section-grid"><div class="section-label">04 · Results</div><div><h2>The simpler rule wins this round</h2><div class="chart" role="img" aria-label="Bar chart showing baseline Precision at 10 of 0.40 and Logistic Regression Precision at 10 of 0.30"><div class="bar-row"><span>Week 4 baseline</span><div class="bar"><span style="width: 80%"></span></div><strong>0.40</strong></div><div class="bar-row model"><span>Logistic Regression</span><div class="bar"><span style="width: 60%"></span></div><strong>0.30</strong></div></div><p>The baseline measured higher Precision@10 on held-out clients. That is an observed comparison on one March-to-April slice, not evidence that the rule causes future improvement. Model errors include false positives caused by SERP context, position, seasonality, intent mismatch, and incomplete engagement coverage.</p></div></div></section>
+    <section><div class="section-grid"><div class="section-label">05 · Limits</div><div><h2>What the score cannot know</h2><ul><li>A CTR gap does not prove that weak metadata or content caused under-capture.</li><li>The panel is unbalanced, GA4 coverage is incomplete, and one outcome month cannot establish stability.</li><li>Hash keys are pseudonymous and do not reveal client or page identity.</li><li>Human review is mandatory before any metadata or content change.</li></ul></div></div></section>
+    <section><div class="section-grid"><div class="section-label">06 · Actions</div><div><h2>Recommended review order</h2><ol><li>Inspect the highest baseline-scoring pages for title, description, SERP features, and intent alignment.</li><li>Reject recommendations where position, seasonality, or page intent explains the gap.</li><li>Measure future Precision@10 across additional months before replacing the baseline.</li><li>Do not automate publishing, deletion, redirects, or causal claims.</li></ol></div></div></section>
+    <section><div class="section-grid"><div class="section-label">07 · Reproduce</div><div><h2>Notebook trail</h2><p><a href="../work/notebooks/w01_research_question.ipynb">Research question</a> · <a href="../work/notebooks/w03_data_contract.ipynb">Data contract</a> · <a href="../work/notebooks/w04_baseline_score.ipynb">Baseline</a> · <a href="../work/notebooks/w05_model.ipynb">Model</a> · <a href="../work/notebooks/w06_validation_audit.ipynb">Validation audit</a> · <a href="../work/notebooks/w07_action_playbook.ipynb">Action playbook</a> · <a href="../work/notebooks/capstone.ipynb">Capstone notebook</a></p><p>Generated queues stay out of version control; JSON receipts remain in <code>work/outputs/</code>. The raw gated warehouse is not redistributed.</p></div></div></section>
+    <section><div class="section-grid"><div class="section-label">Acknowledgments</div><div><h2>Data credit</h2><p>Built on the FlyRank ML Internship dataset. Research and educational use only, following the dataset's data-use terms. Source: <a href="https://flyrank.ai/">flyrank.ai</a>.</p></div></div></section>
+  </main>
+  <footer>CTR Opportunity Scoring · Public-safe research artifact · 2026</footer>
+</body>
+</html>
