@@ -1,0 +1,8 @@
+{
+  "lane": "CTR / Engagement Opportunity Scoring",
+  "month": "2026-03",
+  "rows": 176738,
+  "top_score": 1.2252390199963523,
+  "reason_code": "CTR_UNDERCAPTURE",
+  "action": "metadata_or_content_review"
+}
